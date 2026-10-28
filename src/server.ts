@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { collectAll } from './collect.js';
+import { collectMcpStatus } from './mcpStatus.js';
 import { COOKIE, SECURITY_HEADERS, authenticate, hostOk, makeToken } from './security.js';
 import type { Context } from './types.js';
 
@@ -9,12 +10,14 @@ export type Options = {
   ctx: Context;
   idleMs?: number; // 기본 10분
   collect?: () => Promise<unknown>; // 테스트에서 주입
+  mcpStatus?: () => Promise<unknown>; // 테스트에서 주입
 };
 
 // 정적 파일은 허용 목록만 서빙한다. 경로를 요청에서 조합하지 않는다.
 const STATIC: Record<string, [string, string]> = {
   '/': ['index.html', 'text/html; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
+  '/logic.js': ['logic.js', 'text/javascript; charset=utf-8'],
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
 };
 // shortcut: 컴파일 결과(dist/src) 기준으로 src/ui를 직접 가리킨다. 단계 3에서 배포 구조 확정 시 변경.
@@ -45,6 +48,14 @@ export async function startServer(opts: Options): Promise<{ server: Server; port
     if (path === '/api/extensions') {
       try {
         return send(200, JSON.stringify(await collect()), { 'Content-Type': 'application/json; charset=utf-8' });
+      } catch {
+        return send(500, 'error');
+      }
+    }
+    // 켜진 MCP 서버를 실제로 띄워 연결을 확인한다. 느리고 프로세스를 실행하므로 화면의 버튼으로만 부른다.
+    if (path === '/api/mcp-status') {
+      try {
+        return send(200, JSON.stringify(await (opts.mcpStatus ?? (() => collectMcpStatus(opts.ctx)))()), { 'Content-Type': 'application/json; charset=utf-8' });
       } catch {
         return send(500, 'error');
       }
