@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
-import { mkdir, mkdtemp, stat } from 'node:fs/promises';
+import { mkdir, mkdtemp, realpath, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,7 +13,8 @@ const launcher = fileURLToPath(new URL('../src/launcher.js', import.meta.url));
 
 // 임시 상태 폴더와 임시 프로젝트로 런처를 실행하고, 끝나면 띄운 서버를 반드시 죽인다.
 async function withLauncher(fn: (cwd: string, launch: () => Promise<string>) => Promise<void>) {
-  const root = await mkdtemp(join(tmpdir(), 'ev-l-'));
+  // macOS의 tmpdir은 심볼릭 링크라, 런처의 process.cwd()와 같도록 실제 경로를 쓴다.
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'ev-l-')));
   const cwd = join(root, 'proj');
   await mkdir(cwd);
   process.env.EV_STATE_DIR = join(root, 'state');
