@@ -10,7 +10,7 @@ Node.js + TypeScript로 구현하되, 런타임에는 내장 모듈만 써서 �
 |---|---|---|
 | 언어 | TypeScript (strict) | 타입 안정성 |
 | 런타임 | Node.js 20 LTS 이상 (확정 전) | `node:test` 등 내장 기능 |
-| 서버 | `node:http` | 외부 프레임워크 없이 라우트 2개만 필요 |
+| 서버 | `node:http` | 외부 프레임워크 없이 라우트 4개(API 1 + 정적 3)면 충분 |
 | 토큰 | `node:crypto` `randomBytes(32)` | 예측 불가능한 난수 |
 | 외부 CLI 호출 | `node:child_process` `execFile` | 셸을 거치지 않아 명령 주입 차단 |
 | 파일 읽기 | `node:fs/promises` | 설정 파일과 스킬 폴더 스캔 |
@@ -24,7 +24,7 @@ Node.js + TypeScript로 구현하되, 런타임에는 내장 모듈만 써서 �
 
 1. **스킬 `/extensions-viewer`**: `SKILL.md`에서 `!` 실행으로 런처를 호출한다.
 2. **런처**: 상태 파일(pid, 포트, 토큰, 권한 0600)을 확인해 서버가 있으면 재사용하고, 없으면 분리(detach)해 기동한 뒤 URL만 출력하고 종료한다.
-3. **로컬 서버**: `127.0.0.1` 랜덤 포트. 라우트는 `GET /`(화면)과 `GET /api/extensions`(JSON) 두 개다. 모든 요청이 보안 미들웨어를 거친다.
+3. **로컬 서버**: `127.0.0.1` 랜덤 포트. 라우트는 `GET /api/extensions`(JSON)와 정적 파일 3개(`/`, `/app.js`, `/style.css`)이며, CSP `default-src 'self'`가 인라인 스크립트·스타일을 막아 파일을 분리했다. 모든 요청이 보안 미들웨어를 거친다.
 4. **수집기 3종**: 플러그인, MCP, 스킬을 병렬로 읽고 공통 형식으로 정규화한다.
 5. **마스킹**: 정규화 결과에서 비밀값을 가린 뒤 응답한다.
 6. **화면**: 순수 HTML+JS가 JSON을 받아 탭 3개로 그린다.
@@ -72,7 +72,7 @@ extensions-viewer/
   docs/                  # 이 문서들
   src/
     launcher.ts          # 상태 파일 확인, 서버 기동/재사용, URL 출력
-    server.ts            # node:http 서버, 라우트 2개, 유휴 종료
+    server.ts            # node:http 서버, 라우트 4개, 유휴 종료
     security.ts          # Host·토큰 검증, 보안 헤더
     sanitize.ts          # 비밀값 마스킹
     collectors/

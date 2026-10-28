@@ -1,0 +1,12 @@
+body { font-family: system-ui, sans-serif; margin: 1.5rem; max-width: 60rem; }
+header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+h1 { font-size: 1.25rem; margin: 0; }
+.label { color: #666; font-size: .85rem; }
+.bar { display: flex; gap: 1rem; margin: 1rem 0; align-items: center; }
+#tabs button { padding: .4rem .8rem; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+#tabs button.active { background: #222; color: #fff; }
+#error { color: #b00020; }
+#list { list-style: none; padding: 0; }
+#list li { border-bottom: 1px solid #eee; padding: .5rem 0; }
+.meta { color: #666; font-size: .8rem; }
+.detail { font-size: .85rem; word-break: break-all; }
