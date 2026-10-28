@@ -108,8 +108,9 @@ One collector failing does not hide the others. The failed tab shows the reason.
 <br>
 
 - The page reflects **config files**, not what is loaded in your current session.
-- MCP enabled state is not shown yet.
-- Plugins are read from `installed_plugins.json` and `enabledPlugins`, not from `claude plugin list`.
+- MCP enabled state follows the documented settings (`disabledMcpServers`, `.mcp.json` approvals, plugin state). It shows what the config says, not whether the server is connected. Servers waiting for approval show as unknown.
+- Plugins are read from `installed_plugins.json` and `enabledPlugins`. When the `claude` CLI is available, `claude plugin list --json` and `claude plugin details` refine the enabled state and the component list. Without the CLI, the file values are used.
+- MCP connection status runs `claude mcp list` only when you press the button. It starts your enabled MCP servers, takes a few seconds, and also lists claude.ai connectors that no config file mentions.
 - In testing, Claude Code did not run the skill's `!` command itself. Claude ran the same command through Bash instead, so the result can depend on your Bash permissions. The cause is not yet known.
 - Secrets with no known prefix and no secret-like name, such as a random string in `args`, are not detected.
 
