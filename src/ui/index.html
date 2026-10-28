@@ -2,20 +2,51 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>extensions-viewer</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header>
-    <h1>extensions-viewer</h1>
-    <span class="label">설정 파일 기준 (현재 세션에 로드된 상태와 다를 수 있음)</span>
-  </header>
-  <div class="bar">
-    <nav id="tabs"></nav>
-    <input id="search" type="search" placeholder="검색">
+  <div class="topbar">
+    <div class="bar">
+      <div class="brand">
+        <span class="mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <strong>extensions-viewer</strong>
+        <span class="scope" id="scope"></span>
+      </div>
+      <input id="search" type="search" placeholder="이름, 설명, 명령 검색  ( / )" aria-label="검색">
+      <span class="tag" title="이 도구는 설정을 바꾸지 않습니다">읽기 전용 · 설정 파일 기준</span>
+    </div>
   </div>
-  <p id="error" hidden></p>
-  <ul id="list"></ul>
-  <script src="/app.js"></script>
+  <main class="col">
+    <div class="titlerow">
+      <div>
+        <h1>확장 기능</h1>
+        <p id="finding" class="sub"></p>
+      </div>
+      <div class="actions">
+        <span id="stamp" class="sub"></span>
+        <button id="refresh" type="button">새로고침</button>
+      </div>
+    </div>
+    <div id="tabs" class="tabs" role="tablist" aria-label="종류"></div>
+    <div id="shell" class="shell" data-side="open">
+      <aside id="side" aria-label="필터"></aside>
+      <section class="content">
+        <div class="toolbar">
+          <button id="sidetoggle" type="button" aria-controls="side"></button>
+          <span id="count" class="sub" aria-live="polite"></span>
+          <div id="controls" class="controls"></div>
+        </div>
+        <div class="listwrap">
+          <div id="thead" class="thead" role="presentation"></div>
+          <div id="message" hidden></div>
+          <ul id="list"></ul>
+        </div>
+      </section>
+    </div>
+  </main>
+  <aside id="detail" aria-label="상세" aria-hidden="true" inert></aside>
+  <script type="module" src="/app.js"></script>
 </body>
 </html>

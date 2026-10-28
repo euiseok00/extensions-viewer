@@ -66,8 +66,33 @@ test('정상 토큰: 쿠키로 교체 후 200, 보안 헤더 포함', () =>
     assert.deepEqual(JSON.parse(api.body), DATA);
   }));
 
+test('화면 모듈 3개를 인증 후 서빙한다', () =>
+  withServer(async ({ port, token }) => {
+    const cookie = (await get(port, `/?t=${token}`)).headers['set-cookie'][0].split(';')[0];
+    for (const p of ['/app.js', '/logic.js', '/style.css']) {
+      const r = await get(port, p, { Cookie: cookie });
+      assert.equal(r.status, 200, p);
+      assert.ok(r.body.length > 100, p);
+      assert.equal((await get(port, p)).status, 403, p);
+    }
+  }));
+
+test('/api/mcp-status: 인증이 필요하고 주입한 결과를 돌려준다', async () => {
+  const s = await startServer({ ctx, collect: async () => DATA, mcpStatus: async () => ({ items: [{ name: 'rea', target: 'x', status: 'ok' }] }) });
+  try {
+    assert.equal((await get(s.port, '/api/mcp-status')).status, 403);
+    const cookie = (await get(s.port, `/?t=${s.token}`)).headers['set-cookie'][0].split(';')[0];
+    const r = await get(s.port, '/api/mcp-status', { Cookie: cookie });
+    assert.equal(r.status, 200);
+    assert.equal(JSON.parse(r.body).items[0].name, 'rea');
+  } finally {
+    s.server.close();
+    s.server.closeAllConnections();
+  }
+});
+
 test('화면 코드에 innerHTML이 없다', async () => {
-  for (const f of ['app.js', 'index.html']) {
+  for (const f of ['app.js', 'logic.js', 'index.html']) {
     const text = await readFile(new URL(`../../src/ui/${f}`, import.meta.url), 'utf8');
     assert.ok(!/innerHTML|outerHTML|insertAdjacentHTML|document\.write/.test(text), f);
   }
