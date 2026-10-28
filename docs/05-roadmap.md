@@ -28,11 +28,12 @@ MVP가 로컬 테스트를 통과하면 `06-release-plan.md`의 공개 준비로
 | `claude mcp list` | JSON 출력 여부 불명, 연결 상태 확인이 느릴 수 있음 | 버전별 `--help` 확인 |
 | 스킬 목록 | 공식 목록 CLI를 찾지 못해 폴더 스캔에 의존, 버전 변경에 취약 | 스캔 실패 시 F6로 오류 표시 |
 | 실제 로드 상태 | 화면은 설정 기준이라 지금 세션에 로드된 것과 다를 수 있음 | 화면에 "설정 파일 기준" 라벨 표시 |
-| Windows | 분리(detach) 기동과 경로 구분자가 다름 | 단계 4에서 직접 확인 |
-| Node 최소 버전 | 20 이상으로 가정, 확정 전 | 사용 중인 내장 기능 기준으로 재검토 |
+| macOS·Linux | 이 PC(Windows)에서만 검증함. 분리 기동과 경로 처리는 미검증 | `.github/workflows/ci.yml`(ubuntu·macos·windows × Node 22·24)을 푸시해 결과 확인 |
+| Windows | 확인 완료: 분리 기동 후 부모 종료·재사용 동작, `claude` CLI는 호출하지 않아 `.cmd` 문제 없음 | 해당 없음 |
+| Node 최소 버전 | 22 이상으로 결정(Node 20은 EOL 시점이 2026-04로 알려져 제외, 공식 일정은 미확인). 이 PC는 Node 24에서만 검증, 22는 CI에서 확인. `node --test` glob 처리가 버전마다 달라 `scripts/run-tests.mjs`가 파일 목록을 직접 넘김 | CI의 Node 22 결과 확인, nodejs.org 일정 확인 |
 | 마스킹 한계 | 알려진 접두사·이름 규칙 밖의 임의 문자열 비밀은 `args`·`command`에서 걸러지지 않음 (규칙은 `04-security.md`) | 실제 MCP 설정으로 사례를 모아 규칙 보강 |
-| 수집 범위 (단계 1 구현) | `claude plugin list --json`은 쓰지 않고 `installed_plugins.json`과 `enabledPlugins`만 읽음. MCP 활성 여부는 판정 규칙을 몰라 항상 null. `~/.claude.json`의 프로젝트 키가 슬래시·역슬래시 중 무엇인지 미확인(둘 다 시도) | 버전별 CLI `--help`와 실제 파일로 확인 |
-| 상태 파일 권한 (Windows) | 0600이 Windows에서 적용되지 않아 보안 검증 항목 8 통과 불가 | 대체 방식 결정, 단계 4에서 확인 (`04-security.md`) |
+| 수집 범위 (단계 1 구현) | `claude plugin list --json`은 쓰지 않고 `installed_plugins.json`과 `enabledPlugins`만 읽음. MCP 활성 여부는 판정 규칙을 몰라 항상 null. `~/.claude.json`의 프로젝트 키는 Windows에서 슬래시 구분이고 드라이브 문자 대소문자가 섞여 있음을 확인(정규화해 비교) | 버전별 CLI `--help`와 실제 파일로 확인 |
+| 상태 파일 권한 (Windows) | 0600이 Windows에서 적용되지 않음 | 해결: 프로필 폴더 상속 ACL 확인 후 검증 항목을 플랫폼별로 분리 (`04-security.md`) |
 | 서버 재사용 판별 | pid만으로는 오래된 pid를 구분 못 함 | 구현 완료: 토큰 접속 헬스체크로 판별 (`04-security.md`) |
 | `claude` CLI 지연·실패 | 2초 목표 대비 느리거나 JSON 출력이 없을 수 있음. Windows에서 `.cmd` 래퍼면 셸 없는 `execFile`이 실패할 수 있음(미확인) | 타임아웃과 `settings.json` 대체는 `04-security.md` 참고. Windows 실행은 단계 4에서 시험 |
 | 명령 이름 충돌 | 내장 명령과 이름이 겹치면 한쪽이 가려질 수 있음. `extensions-viewer`는 충돌 가능성이 낮다고 판단하나 확인 필요 | 내 버전의 `/help`와 `/` 자동완성에서 확인 |

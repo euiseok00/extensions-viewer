@@ -43,7 +43,7 @@ README 항목은 다른 프로젝트 사례에서 공통으로 정리된 조언�
 - [ ] "Anthropic과 무관한 비공식 프로젝트이며 Claude는 Anthropic의 상표"라는 고지 (유사 도구들이 쓰는 방식)
 - [ ] SECURITY.md, 이슈·PR 템플릿, CHANGELOG
 - [ ] GitHub Topics, 릴리스 태그(`v0.1.0`)
-- [ ] CI: `tsc` 빌드 + `node:test`
+- [x] CI: `tsc` 빌드 + `node:test` (`.github/workflows/ci.yml` 작성, 실행 결과는 푸시 후 확인)
 - [ ] 호환 Claude Code 버전과 OS 명시 (업데이트로 깨질 수 있음)
 
 **공개 직전 보안 점검**

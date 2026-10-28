@@ -9,7 +9,7 @@ Node.js + TypeScript로 구현하되, 런타임에는 내장 모듈만 써서 �
 | 영역 | 선택 | 사유 |
 |---|---|---|
 | 언어 | TypeScript (strict) | 타입 안정성 |
-| 런타임 | Node.js 20 LTS 이상 (확정 전) | `node:test` 등 내장 기능 |
+| 런타임 | Node.js 22 LTS 이상 (Node 20은 EOL로 제외) | `node:test` 등 내장 기능 |
 | 서버 | `node:http` | 외부 프레임워크 없이 라우트 4개(API 1 + 정적 3)면 충분 |
 | 토큰 | `node:crypto` `randomBytes(32)` | 예측 불가능한 난수 |
 | 외부 CLI 호출 | `node:child_process` `execFile` | 셸을 거치지 않아 명령 주입 차단 |

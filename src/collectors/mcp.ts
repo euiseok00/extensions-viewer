@@ -30,9 +30,11 @@ export async function collectMcp(ctx: Context): Promise<CollectResult> {
   const userCfg = await readJson(claudeJson);
   for (const [n, d] of Object.entries(userCfg?.mcpServers ?? {})) items.push(toExtension(n, d, 'user', claudeJson));
 
-  // 프로젝트 키가 슬래시/역슬래시 어느 쪽인지 확인하지 못해 둘 다 시도한다.
-  const projects = userCfg?.projects ?? {};
-  const local = projects[ctx.cwd] ?? projects[ctx.cwd.replaceAll('\\', '/')];
+  // Windows에서 프로젝트 키는 슬래시 구분이고 드라이브 문자 대소문자가 제각각이라 정규화해서 비교한다.
+  const norm = (p: string) => (process.platform === 'win32' ? p.replaceAll('\\', '/').toLowerCase() : p);
+  const projects: Record<string, any> = userCfg?.projects ?? {};
+  const key = Object.keys(projects).find((k) => norm(k) === norm(ctx.cwd));
+  const local = key === undefined ? undefined : projects[key];
   for (const [n, d] of Object.entries(local?.mcpServers ?? {})) items.push(toExtension(n, d, 'local', claudeJson));
 
   const projFile = join(ctx.cwd, '.mcp.json');
