@@ -55,6 +55,7 @@ type Extension = {
   source: string;            // 읽은 위치(파일 경로 또는 CLI 명령)
   enabled: boolean | null;   // 설정 파일 기준 활성 여부, 알 수 없으면 null
   detail: Record<string, string>; // 버전, 전송 방식, 설명 등 (마스킹 후)
+  parent?: string;           // 단계 5: 플러그인 유래 스킬·MCP의 플러그인 id (예: "name@marketplace")
 };
 
 // 수집기 결과: 실패해도 전체를 막지 않도록 오류를 함께 담는다
