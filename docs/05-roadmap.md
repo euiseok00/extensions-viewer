@@ -22,8 +22,9 @@ MVP가 로컬 테스트를 통과하면 `06-release-plan.md`의 공개 준비로
 
 | 항목 | 내용 | 확인 방법 |
 |---|---|---|
-| 현재 프로젝트 경로 | 스킬에서 실행한 스크립트가 사용자 프로젝트 디렉터리를 어떻게 아는지 불명 | 실제 Claude Code에서 `process.cwd()` 출력 실험 |
-| 빌드 결과 위치 | 스킬이 컴파일된 JS를 어떻게 참조할지 미정(스킬 폴더에 포함 vs `npx`) | 단계 3에서 두 방식 시험 |
+| 현재 프로젝트 경로 | 런처는 `process.cwd()`를 프로젝트로 본다. 공식 문서상 `!` 명령은 세션 셸의 현재 디렉터리에서 실행되며 Claude가 `cd`하면 바뀔 수 있다. 실제 값은 미확인 | 실제 Claude Code에서 스킬 실행 후 URL의 서버가 보는 프로젝트(MCP·스킬 범위)가 맞는지 확인 |
+| 빌드 결과 위치 | 스킬 폴더에 빌드 결과를 포함하는 방식으로 구현(`npm run bundle`, `${CLAUDE_SKILL_DIR}` 사용). 샌드박스에서는 동작 확인, 실제 Claude Code에서는 미확인. `npx` 방식은 미시험 | 실제 Claude Code에서 `/extensions-viewer` 실행 |
+| `!` 명령 자동 실행 | 실제 Claude Code에서 `/extensions-viewer`를 실행하니 `!` 줄이 실행 결과로 치환되지 않고 "run this first, exactly as written…" 지시문으로 들어왔고, Claude가 명령을 Bash로 대신 실행해 URL이 나왔다. 원인(버전, 설정, 권한 등)은 미확인이며, 이 경로로는 Claude를 거치므로 Bash 권한 허용 여부에 따라 동작이 달라질 수 있다 | 원인 조사. `allowed-tools: Bash(...)` 지정 효과와 다른 버전·설정에서의 동작을 시험하고, SKILL.md 본문이 두 경우 모두 URL 한 줄만 답하는지 확인 |
 | `claude mcp list` | JSON 출력 여부 불명, 연결 상태 확인이 느릴 수 있음 | 버전별 `--help` 확인 |
 | 스킬 목록 | 공식 목록 CLI를 찾지 못해 폴더 스캔에 의존, 버전 변경에 취약 | 스캔 실패 시 F6로 오류 표시 |
 | 실제 로드 상태 | 화면은 설정 기준이라 지금 세션에 로드된 것과 다를 수 있음 | 화면에 "설정 파일 기준" 라벨 표시 |
@@ -32,6 +33,6 @@ MVP가 로컬 테스트를 통과하면 `06-release-plan.md`의 공개 준비로
 | 마스킹 한계 | 알려진 접두사·이름 규칙 밖의 임의 문자열 비밀은 `args`·`command`에서 걸러지지 않음 (규칙은 `04-security.md`) | 실제 MCP 설정으로 사례를 모아 규칙 보강 |
 | 수집 범위 (단계 1 구현) | `claude plugin list --json`은 쓰지 않고 `installed_plugins.json`과 `enabledPlugins`만 읽음. MCP 활성 여부는 판정 규칙을 몰라 항상 null. `~/.claude.json`의 프로젝트 키가 슬래시·역슬래시 중 무엇인지 미확인(둘 다 시도) | 버전별 CLI `--help`와 실제 파일로 확인 |
 | 상태 파일 권한 (Windows) | 0600이 Windows에서 적용되지 않아 보안 검증 항목 8 통과 불가 | 대체 방식 결정, 단계 4에서 확인 (`04-security.md`) |
-| 서버 재사용 판별 | pid만으로는 오래된 pid를 구분 못 함 | pid + 포트 헬스체크, 단계 3에서 시험 (`04-security.md`) |
+| 서버 재사용 판별 | pid만으로는 오래된 pid를 구분 못 함 | 구현 완료: 토큰 접속 헬스체크로 판별 (`04-security.md`) |
 | `claude` CLI 지연·실패 | 2초 목표 대비 느리거나 JSON 출력이 없을 수 있음. Windows에서 `.cmd` 래퍼면 셸 없는 `execFile`이 실패할 수 있음(미확인) | 타임아웃과 `settings.json` 대체는 `04-security.md` 참고. Windows 실행은 단계 4에서 시험 |
 | 명령 이름 충돌 | 내장 명령과 이름이 겹치면 한쪽이 가려질 수 있음. `extensions-viewer`는 충돌 가능성이 낮다고 판단하나 확인 필요 | 내 버전의 `/help`와 `/` 자동완성에서 확인 |

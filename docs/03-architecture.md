@@ -72,6 +72,8 @@ extensions-viewer/
   docs/                  # 이 문서들
   src/
     launcher.ts          # 상태 파일 확인, 서버 기동/재사용, URL 출력
+    serve.ts             # 분리 기동되는 서버 프로세스, 상태 파일 기록·삭제
+    state.ts             # 상태 파일(cwd별) 읽기·쓰기
     server.ts            # node:http 서버, 라우트 4개, 유휴 종료
     security.ts          # Host·토큰 검증, 보안 헤더
     sanitize.ts          # 비밀값 마스킹
@@ -83,7 +85,8 @@ extensions-viewer/
       index.html
       app.js             # textContent만 사용
   test/                  # node:test 단위 테스트
-  skill/extensions-viewer/SKILL.md   # 설치 시 .claude/skills/extensions-viewer/ 로 복사
+  skill/extensions-viewer/SKILL.md   # `npm run bundle`이 빌드 결과와 함께 .claude/skills/extensions-viewer/ 로 묶는다
+  scripts/bundle-skill.mjs
   package.json
   tsconfig.json
 ```
