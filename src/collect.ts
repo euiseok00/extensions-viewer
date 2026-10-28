@@ -1,3 +1,4 @@
+import { basename } from 'node:path';
 import type { CollectResult, Context } from './types.js';
 import { collectMcp } from './collectors/mcp.js';
 import { collectPlugins } from './collectors/plugins.js';
@@ -18,5 +19,5 @@ export async function collectAll(ctx: Context) {
     safe(collectMcp, ctx),
     safe(collectSkills, ctx),
   ]);
-  return { plugins, mcp, skills };
+  return { plugins, mcp, skills, meta: { project: basename(ctx.cwd), generatedAt: new Date().toISOString() } };
 }
